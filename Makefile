@@ -1,11 +1,11 @@
 #!make -f
 
 CXX=clang++-9
-CXXFLAGS=-std=c++2a -Werror -Wsign-conversion -g
+CXXFLAGS=-std=c++2a -Werror -Wsign-conversion
 
 SOURCES=Matrix.cpp
 OBJECTS=$(subst .cpp,.o,$(SOURCES))
-all:run
+
 run: demo
 	./$^
 

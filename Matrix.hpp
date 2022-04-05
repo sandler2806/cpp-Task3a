@@ -38,7 +38,5 @@ namespace zich{
 
         friend std::ostream& operator<< (std::ostream& output, const Matrix& matrix);
         friend std::istream& operator>> (std::istream& input , Matrix& matrix);
-
-        [[nodiscard]] string toString()const;
     };
 }

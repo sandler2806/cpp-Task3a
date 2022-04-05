@@ -96,16 +96,16 @@ Matrix& Matrix::operator-=(const Matrix &other) {
     return *this;
 }
 
-string Matrix::toString()const {
+std::ostream &zich::operator<<(ostream &output, const Matrix &matrix) {
     string str;
-    if(this->mat.empty()||this->mat.at(0).empty()){
+    if(matrix.mat.empty()||matrix.mat.at(0).empty()){
         throw invalid_argument( "\nthe matrix is empty" );
     }
     // convert the matrix to string
-    for (unsigned long i = 0; i < this->mat.size(); ++i) {
+    for (unsigned long i = 0; i < matrix.mat.size(); ++i) {
         str+='[';
-        for (unsigned long j = 0; j < this->mat.at(0).size(); ++j) {
-            double x=this->mat.at(i).at(j);
+        for (unsigned long j = 0; j < matrix.mat.at(0).size(); ++j) {
+            double x=matrix.mat.at(i).at(j);
             str+= std::to_string(x);
             str.erase ( str.find_last_not_of('0') + 1, std::string::npos );
             str[str.length()-1]=' ';
@@ -113,12 +113,7 @@ string Matrix::toString()const {
         str.erase ( str.length()-1);
         str+="]\n";
     }
-    return str;
-}
-
-std::ostream &zich::operator<<(ostream &output, const Matrix &matrix) {
-
-    return output<<matrix.toString();
+    return output<<str;
 }
 
 std::istream &zich::operator>>(istream &input, Matrix &matrix) {
@@ -154,23 +149,6 @@ std::istream &zich::operator>>(istream &input, Matrix &matrix) {
         }
     }
 
-
-//    char a=' ';
-//    string string;
-//    char* c=&a;
-//    input.read(c,1);
-//    if(*c!='['){
-//        throw invalid_argument( "\nthe first char is not '['" );
-//    }
-//    while (input.get(*c)) {
-//        while (input.peek()!=' '||input.peek()!=']'){
-////            input.read(c,1);
-//            input.get(*c);
-//            if((*c>'9'||*c<'0')&&(*c!=' '||*c!=']')){
-//                throw invalid_argument( "\nwrong template" );
-//            }
-//        }
-//    }
     return input;
 }
 
