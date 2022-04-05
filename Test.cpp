@@ -1,137 +1,239 @@
 #include "doctest.h"
-#include "Notebook.hpp"
-using namespace ariel;
-
+#include "Matrix.hpp"
+using namespace zich;
 using namespace std;
 
 
-TEST_CASE("basic input") {
-    ariel::Notebook notebook;
-    notebook.write(/*page=*/100, /*row=*/100, /*column=*/50, Direction::Horizontal, "abcd");
-    CHECK(notebook.read(/*page=*/100, /*row=*/99, /*column=*/51, Direction::Vertical, /*length=*/3)=="_b_");
-    notebook.erase(/*page=*/100, /*row=*/99, /*column=*/51, Direction::Vertical, /*length=*/3);
-    CHECK(notebook.read(/*page=*/100, /*row=*/100, /*column=*/49, Direction::Horizontal, /*length=*/5)=="_a~cd");
+TEST_CASE("valid input") {
+
+//test all the operators on 3*3 square matrices
+    std::vector<double> a = {1, 2, 3,
+                             4, 5, 6,
+                             7, 8, 9};
+
+    std::vector<double> b = {2,0, -5,
+                             6, -3, 4,
+                             -6, 0, 9};
+
+
+    Matrix aS{a, 3, 3};
+    Matrix bS{b, 3, 3};
+
+    CHECK((-bS).toString()=="[-2 0 5]\n"
+                            "[-6 3 -4]\n"
+                            "[6 0 -9]\n");
+
+    CHECK((aS+bS).toString()=="[3 2 -2]\n"
+                            "[10 2 10]\n"
+                            "[1 8 18]\n");
+    Matrix aT=+aS;
+    aT+=bS;
+    CHECK(aT.toString()=="[3 2 -2]\n"
+                         "[10 2 10]\n"
+                         "[1 8 18]\n");
+
+    CHECK((aS-bS).toString()=="[-1 2 8]\n"
+                            "[-2 8 2]\n"
+                            "[13 8 0]\n");
+    aT=+aS;
+    aT-=bS;
+    CHECK(aT.toString()=="[-1 2 8]\n"
+                         "[-2 8 2]\n"
+                         "[13 8 0]\n");
+
+    CHECK((aS*bS).toString()=="[-4 -6 30]\n"
+                            "[2 -15 54]\n"
+                            "[8 -24 78]\n");
+
+    CHECK((-3*aS).toString()=="[-3 -6 -9]\n"
+                              "[-12 -15 -18]\n"
+                              "[-21 -24 -27]\n");
+
+    aT=+aS;
+    aT*=-3;
+    CHECK((aT).toString()=="[-3 -6 -9]\n"
+                           "[-12 -15 -18]\n"
+                           "[-21 -24 -27]\n");
+
+    CHECK((bS*4).toString()=="[8 0 -20]\n"
+                             "[24 -12 16]\n"
+                             "[-24 0 36]\n");
+
+    CHECK((aS++).toString()=="[1 2 3]\n"
+                            "[4 5 6]\n"
+                            "[7 8 9]\n");
+
+    CHECK((aS).toString()=="[2 3 4]\n"
+                          "[5 6 7]\n"
+                          "[8 9 10]\n");
+
+    CHECK((++aS).toString()=="[3 4 5]\n"
+                            "[6 7 8]\n"
+                            "[9 10 11]\n");
+
+    //check comparison operators on 3*3 square matrices
+    aT=+aS;
+    CHECK(aT==aS);
+    CHECK(aT!=bS);
+    CHECK(aS>bS);
+    CHECK(aS>=bS);
+    CHECK(bS<aS);
+    CHECK(bS<=aS);
+
+    CHECK_FALSE(aT!=aS);
+    CHECK_FALSE(aT==bS);
+    CHECK_FALSE(aS<bS);
+    CHECK_FALSE(aS<=bS);
+    CHECK_FALSE(bS>aS);
+    CHECK_FALSE(bS>=aS);
+
+
+//test all the operators on non-square matrices 3*4 and 4*3
+    std::vector<double> c = {2,5,-3,6,
+                             1,6,-2,-7,
+                             0,2,-6,8};
+
+    std::vector<double> c2 = {5,1,7,-4,
+                              3,6,-1,7,
+                              0,-3,-5,1};
+
+    std::vector<double> d = {1,4,7,
+                             3,-1,-8,
+                             0,4,-6,
+                             0,2,-7};
+    Matrix cC{c, 3, 4};
+    Matrix cC2{c2, 3, 4};
+    Matrix dR{d, 4, 3};
+
+    CHECK((-dR).toString()=="[-1 -4 -7]\n"
+                            "[-3 1 8]\n"
+                            "[0 -4 6]\n"
+                            "[0 -2 7]\n");
+
+    CHECK((cC+cC2).toString()=="[7 6 4 2]\n"
+                               "[4 12 -3 0]\n"
+                               "[0 -1 -11 9]\n");
+
+    Matrix cT=+cC;
+    cT+=cC2;
+            CHECK(cT.toString()=="[7 6 4 2]\n"
+                                 "[4 12 -3 0]\n"
+                                 "[0 -1 -11 9]\n");
+
+
+    CHECK((cC-cC2).toString()=="[-3 4 -10 10]\n"
+                               "[-2 0 -1 -14]\n"
+                               "[0 5 -1 7]\n");
+
+
+    cT=+cC;
+    cT-=cC2;
+    CHECK(cT.toString()=="[-3 4 -10 10]\n"
+                         "[-2 0 -1 -14]\n"
+                         "[0 5 -1 7]\n");
+
+
+    CHECK((cC*dR).toString()=="[17 3 -50]\n"
+                              "[19 -24 20]\n"
+                              "[6 -10 -36]\n");
+
+    CHECK((-5*cC2).toString()=="[-25 -5 -35 20]\n"
+                               "[-15 -30 5 -35]\n"
+                               "[0 15 25 -5]\n");
+
+    cT=+cC2;
+    cT*=-5;
+    CHECK((cT).toString()=="[-25 -5 -35 20]\n"
+                           "[-15 -30 5 -35]\n"
+                           "[0 15 25 -5]\n");
+
+    CHECK((dR*6).toString()=="[6 24 42]\n"
+                             "[18 -6 -48]\n"
+                             "[0 24 -36]\n"
+                             "[0 12 -42]\n");
+
+    CHECK((cC--).toString()=="[2 5 -3 6]\n"
+                             "[1 6 -2 -7]\n"
+                             "[0 2 -6 8]\n");
+
+    CHECK((cC).toString()=="[1 4 -4 5]\n"
+                           "[0 5 -3 -8]\n"
+                           "[-1 1 -7 7]\n");
+
+    CHECK((--cC).toString()=="[0 3 -5 4]\n"
+                             "[-1 4 -4 -9]\n"
+                             "[-2 0 -8 6]\n");
+
+
+    //check comparison operators on non-square matrices 3*4 and 4*3
+
+    cT=+cC;
+    CHECK(cT==cC);
+    CHECK(cC!=cC2);
+    CHECK(cC2>cC);
+    CHECK(cC2>=cC);
+    CHECK(cC<cC2);
+    CHECK(cC<=cC2);
+
+    CHECK_FALSE(cT!=cC);
+    CHECK_FALSE(cC==cC2);
+    CHECK_FALSE(cC2<cC);
+    CHECK_FALSE(cC2<=cC);
+    CHECK_FALSE(cC>cC2);
+    CHECK_FALSE(cC>=cC2);
+
 }
-TEST_CASE("Edge cases") {
-    for (int page = 222; page < 224; page++) {//running over 2 pages
-        for (int row = 151; row < 153; ++row) {//running over 2 rows
-            for (int column = 0; column < 100; column+=2) {//running over all the columns
-                //running over all the possible lengths of string to this column
-                for (int length = 0; length < 101-column ;length+=2) {
-                    ariel::Notebook notebookTemp;
-                    string str(static_cast<unsigned long>(length), 'a');//creates a string in size of the length
-                            CHECK_NOTHROW(notebookTemp.write(/*page=*/page, /*row=*/row, /*column=*/column, Direction::Horizontal,str));
-                            CHECK(notebookTemp.read(/*page=*/page, /*row=*/row, /*column=*/column, Direction::Horizontal,str.length())==str);
-                            CHECK_NOTHROW(notebookTemp.erase(/*page=*/page, /*row=*/row, /*column=*/column, Direction::Horizontal,str.length()));
-                }
-            }
-        }
-    }
-    ariel::Notebook notebook;
-    //    make sure that it doesn't throw exception if we try to erase in empty place Vertical\Horizontal
-            CHECK_NOTHROW(notebook.erase(/*page=*/99, /*row=*/99, /*column=*/51, Direction::Vertical, /*length=*/3));
-            CHECK_NOTHROW(notebook.erase(/*page=*/99, /*row=*/99, /*column=*/51, Direction::Horizontal, /*length=*/3));
-    //    make sure that it doesn't throw exception if we try to erase after erasing at the same place Vertical\Horizontal
-            CHECK_NOTHROW(notebook.erase(/*page=*/99, /*row=*/99, /*column=*/41, Direction::Vertical,13));
-            CHECK_NOTHROW(notebook.erase(/*page=*/99, /*row=*/99, /*column=*/41, Direction::Horizontal,13));
 
-    //    make sure all the functions doesn't throw exception if the string\length bigger than 100 while direction Vertical
-            CHECK_NOTHROW(notebook.write(/*page=*/100, /*row=*/99, /*column=*/0, Direction::Vertical, "abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvw"));
-            CHECK_NOTHROW(notebook.read(/*page=*/100, /*row=*/99, /*column=*/0, Direction::Vertical, 101));
-            CHECK_NOTHROW(notebook.erase(/*page=*/100, /*row=*/99, /*column=*/0, Direction::Vertical,101));
-
-    //    make sure all the functions doesn't throw exception if the string\length equal to 100 while direction Horizontal
-            CHECK_NOTHROW(notebook.write(/*page=*/100, /*row=*/97, /*column=*/0, Direction::Horizontal, "abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuv"));
-            CHECK_NOTHROW(notebook.read(/*page=*/100, /*row=*/99, /*column=*/0, Direction::Horizontal, 100));
-            CHECK_NOTHROW(notebook.erase(/*page=*/100, /*row=*/99, /*column=*/0, Direction::Horizontal,100));
-
-    //    make sure all the functions doesn't throw exception if the string\length+column equal to 100 while direction Horizontal
-            CHECK_NOTHROW(notebook.write(/*page=*/100, /*row=*/98, /*column=*/2, Direction::Horizontal, "abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrst"));
-            CHECK_NOTHROW(notebook.read(/*page=*/100, /*row=*/99, /*column=*/51, Direction::Horizontal, 49));
-            CHECK_NOTHROW(notebook.erase(/*page=*/100, /*row=*/99, /*column=*/40, Direction::Horizontal,60));
-
-//    reading from empty place, so it will show only ____
-            CHECK(notebook.read(/*page=*/88, /*row=*/99, /*column=*/40, Direction::Horizontal,5)=="_____");
-            CHECK(notebook.read(/*page=*/88, /*row=*/99, /*column=*/40, Direction::Vertical,5)=="_____");
-
-    //    make sure all the functions doesn't throw exception if the string\length equal to 0 while direction Horizontal
-            CHECK_NOTHROW(notebook.write(/*page=*/88, /*row=*/99, /*column=*/40, Direction::Horizontal,""));
-            CHECK(notebook.read(/*page=*/88, /*row=*/99, /*column=*/40, Direction::Horizontal,0)=="");
-            CHECK_NOTHROW(notebook.erase(/*page=*/88, /*row=*/99, /*column=*/40, Direction::Horizontal,0));
-
-    //    make sure all the functions doesn't throw exception if the string\length equal to 0 while direction Vertical
-            CHECK_NOTHROW(notebook.write(/*page=*/88, /*row=*/99, /*column=*/40, Direction::Vertical,""));
-            CHECK(notebook.read(/*page=*/88, /*row=*/99, /*column=*/40, Direction::Vertical,0)=="");
-            CHECK_NOTHROW(notebook.erase(/*page=*/88, /*row=*/99, /*column=*/40, Direction::Vertical,0));
-}
 TEST_CASE("exceptions check") {
-    ariel::Notebook notebook;
-    for (int i = 0; i <32 ; i++)
-    {
-        string s;
-        s+= char(i);
-        CHECK_THROWS(notebook.write(/*page=*/10, /*row=*/99, /*column=*/41, Direction::Vertical,s));
-    }
-        for (int i = 127; i <256 ; i++)
-    {
-        string s;
-        s+= char(i);
-        CHECK_THROWS(notebook.write(/*page=*/10, /*row=*/99, /*column=*/41, Direction::Vertical,s));
-    }
-    
-//    make sure all the functions throws exception if the one of those parameters
-//    page\row\column\string\length is negative while direction Horizontal\Vertical
-    CHECK_THROWS(notebook.write(/*page=*/-1, /*row=*/99, /*column=*/41, Direction::Vertical,"~"));
-    CHECK_THROWS(notebook.write(/*page=*/88, /*row=*/-4, /*column=*/41, Direction::Vertical,"~"));
-    CHECK_THROWS(notebook.write(/*page=*/88, /*row=*/99, /*column=*/-8, Direction::Vertical,"~"));
-    CHECK_THROWS(notebook.write(/*page=*/-12, /*row=*/99, /*column=*/41, Direction::Horizontal,"~"));
-    CHECK_THROWS(notebook.write(/*page=*/88, /*row=*/-56, /*column=*/41, Direction::Horizontal,"~"));
-    CHECK_THROWS(notebook.write(/*page=*/88, /*row=*/99, /*column=*/-9, Direction::Horizontal,"~"));
+    std::vector<double> c = {2,5,-3,6,
+                             1,6,-2,-7,
+                             0,2,-6,8};
 
-    CHECK_THROWS(notebook.read(/*page=*/-43, /*row=*/99, /*column=*/0, Direction::Horizontal, 101));
-    CHECK_THROWS(notebook.read(/*page=*/100, /*row=*/-34, /*column=*/0, Direction::Horizontal, 101));
-    CHECK_THROWS(notebook.read(/*page=*/100, /*row=*/99, /*column=*/-56, Direction::Horizontal, 101));
-    CHECK_THROWS(notebook.read(/*page=*/100, /*row=*/99, /*column=*/0, Direction::Horizontal, -1));
-    CHECK_THROWS(notebook.read(/*page=*/-21, /*row=*/99, /*column=*/0, Direction::Vertical, 101));
-    CHECK_THROWS(notebook.read(/*page=*/100, /*row=*/-32, /*column=*/0, Direction::Vertical, 101));
-    CHECK_THROWS(notebook.read(/*page=*/100, /*row=*/99, /*column=*/-56, Direction::Vertical, 101));
-    CHECK_THROWS(notebook.read(/*page=*/100, /*row=*/99, /*column=*/0, Direction::Vertical, -6));
+    std::vector<double> d = {1,4,7,
+                             3,-1,-8,
+                             0,4,-6,
+                             0,2,-7};
+    std::vector<double> a = {1, 2, 3,
+                             4, 5, 6,
+                             7, 8, 9};
 
-    CHECK_THROWS(notebook.erase(/*page=*/-54, /*row=*/99, /*column=*/0, Direction::Horizontal,101));
-    CHECK_THROWS(notebook.erase(/*page=*/100, /*row=*/-31, /*column=*/0, Direction::Horizontal,101));
-    CHECK_THROWS(notebook.erase(/*page=*/100, /*row=*/99, /*column=*/16, Direction::Horizontal,101));
-    CHECK_THROWS(notebook.erase(/*page=*/100, /*row=*/99, /*column=*/0, Direction::Horizontal,-8));
-    CHECK_THROWS(notebook.erase(/*page=*/-42, /*row=*/99, /*column=*/0, Direction::Vertical,101));
-    CHECK_THROWS(notebook.erase(/*page=*/100, /*row=*/-45, /*column=*/0, Direction::Vertical,101));
-    CHECK_THROWS(notebook.erase(/*page=*/100, /*row=*/99, /*column=*/-56, Direction::Vertical,101));
-    CHECK_THROWS(notebook.erase(/*page=*/100, /*row=*/99, /*column=*/0, Direction::Vertical,-7));
+    Matrix aS{a, 3, 3};
+    Matrix cC{c, 3, 4};
+    Matrix dR{d, 4, 3};
 
-//    writing the char ~ that is equal to erase Vertical\Horizontal
-    CHECK_THROWS(notebook.write(/*page=*/88, /*row=*/99, /*column=*/40, Direction::Vertical,"~"));
-    CHECK_THROWS(notebook.write(/*page=*/88, /*row=*/99, /*column=*/41, Direction::Horizontal,"~"));
+//    create matrices with wrong size of row\column
+    CHECK_THROWS(Matrix* t=new Matrix(a,3,4));
+    CHECK_THROWS(Matrix* t=new Matrix(a,4,3));
+    CHECK_THROWS(Matrix* t=new Matrix(a,4,4));
+    CHECK_THROWS(Matrix* t=new Matrix(c,4,4));
+    CHECK_THROWS(Matrix* t=new Matrix(c,3,5));
 
-//    make sure all the functions throws exception if the string\length bigger than 100 while direction Horizontal
-    CHECK_THROWS(notebook.write(/*page=*/100, /*row=*/99, /*column=*/0, Direction::Horizontal, "abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvw"));
-    CHECK_THROWS(notebook.read(/*page=*/100, /*row=*/99, /*column=*/0, Direction::Horizontal, 101));
-    CHECK_THROWS(notebook.erase(/*page=*/100, /*row=*/99, /*column=*/0, Direction::Horizontal,101));
+//check operators on matrices with different size
+    CHECK_THROWS(cC+dR);
+    CHECK_THROWS(cC-dR);
+    CHECK_THROWS(cC-=dR);
+    CHECK_THROWS(cC+=dR);
+    CHECK_THROWS(aS*dR);
+    CHECK_THROWS(cC*aS);
 
-//    make sure all the functions throws exception if the string\length+column bigger than 100 while direction Horizontal(so it will need to get to the next row)
-    CHECK_THROWS(notebook.write(/*page=*/100, /*row=*/99, /*column=*/3, Direction::Horizontal, "abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrst"));
-    CHECK_THROWS(notebook.read(/*page=*/100, /*row=*/99, /*column=*/52, Direction::Horizontal, 49));
-    CHECK_THROWS(notebook.erase(/*page=*/100, /*row=*/99, /*column=*/41, Direction::Horizontal,60));
+    CHECK_THROWS(dR+cC);
+    CHECK_THROWS(dR+=cC);
+    CHECK_THROWS(dR-cC);
+    CHECK_THROWS(dR-=cC);
 
-    //    make sure that throws exception if we try to write after erasing at the same place Vertical\Horizontal
-    notebook.erase(/*page=*/99, /*row=*/99, /*column=*/51, Direction::Vertical, /*length=*/3);
-    CHECK_THROWS(notebook.write(/*page=*/99, /*row=*/101, /*column=*/51, Direction::Vertical, "abc"));
-    notebook.erase(/*page=*/99, /*row=*/99, /*column=*/51, Direction::Horizontal, /*length=*/3);
-    CHECK_THROWS(notebook.write(/*page=*/99, /*row=*/99, /*column=*/53, Direction::Horizontal, "abc"));
+//check comparison operators on matrices with different size
+    CHECK_THROWS(bool ans=cC==dR);
+    CHECK_THROWS(bool ans=cC!=dR);
+    CHECK_THROWS(bool ans=cC>dR);
+    CHECK_THROWS(bool ans=cC>=dR);
+    CHECK_THROWS(bool ans=cC<dR);
+    CHECK_THROWS(bool ans=cC<=dR);
 
-    //    make sure that throws exception if we try to write after writing at the same place Vertical\Horizontal
-    notebook.write(/*page=*/101, /*row=*/101, /*column=*/51, Direction::Horizontal, "abc");
-    CHECK_THROWS(notebook.write(/*page=*/101, /*row=*/101, /*column=*/53, Direction::Horizontal, "abc"));
-    notebook.write(/*page=*/100, /*row=*/101, /*column=*/51, Direction::Vertical, "abc");
-    CHECK_THROWS(notebook.write(/*page=*/100, /*row=*/99, /*column=*/51, Direction::Vertical, "abc"));
-
-
+    CHECK_THROWS(bool ans=aS==dR);
+    CHECK_THROWS(bool ans=aS!=dR);
+    CHECK_THROWS(bool ans=aS>dR);
+    CHECK_THROWS(bool ans=aS>=dR);
+    CHECK_THROWS(bool ans=aS<dR);
+    CHECK_THROWS(bool ans=aS<=dR);
 
 }
